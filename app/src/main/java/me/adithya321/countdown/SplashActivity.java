@@ -58,6 +58,7 @@ public class SplashActivity extends AppCompatActivity {
         setContentView(R.layout.activity_splash);
         ButterKnife.bind(this);
         createPermissionListener();
+        Dexter.checkPermission(calendarPermissionListener, Manifest.permission.READ_CALENDAR);
         Dexter.continuePendingRequestIfPossible(calendarPermissionListener);
     }
 

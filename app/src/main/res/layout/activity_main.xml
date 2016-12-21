@@ -76,5 +76,6 @@
         android:layout_gravity="end|bottom"
         android:layout_margin="@dimen/fab_margin"
         android:src="@drawable/ic_add_white"
+        android:onClick="onAddFabClick"
         app:useCompatPadding="true" />
 </android.support.design.widget.CoordinatorLayout>

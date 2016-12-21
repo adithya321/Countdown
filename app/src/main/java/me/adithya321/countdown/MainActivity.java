@@ -18,7 +18,9 @@
 
 package me.adithya321.countdown;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.provider.CalendarContract;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
@@ -66,5 +68,11 @@ public class MainActivity extends AppCompatActivity {
         int pageMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 4,
                 getResources().getDisplayMetrics());
         viewpager.setPageMargin(pageMargin);
+    }
+
+    public void onAddFabClick(View view) {
+        Intent intent = new Intent(Intent.ACTION_INSERT)
+                .setData(CalendarContract.Events.CONTENT_URI);
+        startActivity(intent);
     }
 }
