@@ -18,6 +18,11 @@
 
 package me.adithya321.countdown;
 
+import android.content.ContentUris;
+import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
+import android.provider.CalendarContract;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -36,9 +41,11 @@ import butterknife.ButterKnife;
 import me.everything.providers.android.calendar.Event;
 
 public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> {
+    private Context context;
     private List<Event> eventList;
 
-    public EventAdapter(List<Event> eventList) {
+    public EventAdapter(Context context, List<Event> eventList) {
+        this.context = context;
         this.eventList = eventList;
     }
 
@@ -50,13 +57,23 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> 
 
     @Override
     public void onBindViewHolder(final ViewHolder viewHolder, int position) {
-        Event event = eventList.get(position);
+        final Event event = eventList.get(position);
 
         viewHolder.eventTitle.setText(event.title);
         LocalDate today = new LocalDate();
         LocalDate eventDate = new LocalDate(event.dTStart);
         int days = Days.daysBetween(today, eventDate).getDays();
         viewHolder.eventDaysLeft.setText(String.valueOf(days));
+
+        viewHolder.view.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                long eventID = event.id;
+                Uri uri = ContentUris.withAppendedId(CalendarContract.Events.CONTENT_URI, eventID);
+                Intent intent = new Intent(Intent.ACTION_VIEW).setData(uri);
+                context.startActivity(intent);
+            }
+        });
     }
 
     @Override

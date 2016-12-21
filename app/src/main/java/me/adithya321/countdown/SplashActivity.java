@@ -67,6 +67,7 @@ public class SplashActivity extends AppCompatActivity {
             @Override
             public void onPermissionGranted(PermissionGrantedResponse response) {
                 startActivity(new Intent(SplashActivity.this, MainActivity.class));
+                finish();
             }
 
             @Override

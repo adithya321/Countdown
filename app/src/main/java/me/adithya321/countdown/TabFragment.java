@@ -111,7 +111,7 @@ public class TabFragment extends Fragment {
                 }
             });
 
-            EventAdapter eventAdapter = new EventAdapter(eventList);
+            EventAdapter eventAdapter = new EventAdapter(getActivity(), eventList);
             recyclerView.setAdapter(eventAdapter);
 
             if (eventAdapter.getItemCount() == 0) {
