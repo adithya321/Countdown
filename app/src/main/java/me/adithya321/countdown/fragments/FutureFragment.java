@@ -21,8 +21,7 @@ package me.adithya321.countdown.fragments;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,8 +37,13 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import co.moonmonkeylabs.realmrecyclerview.RealmRecyclerView;
+import io.realm.Realm;
+import io.realm.RealmResults;
+import io.realm.Sort;
 import me.adithya321.countdown.R;
-import me.adithya321.countdown.adapters.EventAdapter;
+import me.adithya321.countdown.activities.RealmBaseActivity;
+import me.adithya321.countdown.adapters.EventRealmAdapter;
 import me.adithya321.countdown.utils.DateUtils;
 import me.everything.providers.android.calendar.Calendar;
 import me.everything.providers.android.calendar.CalendarProvider;
@@ -47,8 +51,8 @@ import me.everything.providers.android.calendar.Event;
 
 public class FutureFragment extends Fragment {
 
-    @BindView(R.id.recycler_view)
-    RecyclerView recyclerView;
+    @BindView(R.id.realm_recycler_view)
+    RealmRecyclerView realmRecyclerView;
     @BindView(R.id.empty_icon)
     ImageView emptyIcon;
     @BindView(R.id.empty_text)
@@ -56,10 +60,14 @@ public class FutureFragment extends Fragment {
     @BindView(R.id.empty_view)
     LinearLayout emptyView;
 
+    private Realm realm;
+    private View view;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_future, container, false);
+        view = inflater.inflate(R.layout.fragment_future, container, false);
         ButterKnife.bind(this, view);
+        realm = Realm.getInstance(((RealmBaseActivity) getActivity()).getRealmConfig());
         return view;
     }
 
@@ -67,10 +75,19 @@ public class FutureFragment extends Fragment {
     public void onViewCreated(View view, Bundle bundle) {
         super.onViewCreated(view, bundle);
         ButterKnife.bind(this, view);
-        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
-        recyclerView.setLayoutManager(layoutManager);
 
-        new getEventsTask().execute();
+        RealmResults<me.adithya321.countdown.models.Event> eventRealmResults = realm
+                .where(me.adithya321.countdown.models.Event.class)
+                .findAllSorted("date", Sort.ASCENDING);
+        if (eventRealmResults.size() == 0) new getEventsTask().execute();
+        else {
+            EventRealmAdapter eventRealmAdapter = new EventRealmAdapter(getActivity(),
+                    eventRealmResults, true, true);
+            RealmRecyclerView realmRecyclerView = (RealmRecyclerView) view
+                    .findViewById(R.id.realm_recycler_view);
+            realmRecyclerView.setAdapter(eventRealmAdapter);
+            new getEventsTask().execute();
+        }
     }
 
     private class getEventsTask extends AsyncTask<Void, Void, List<Event>> {
@@ -93,13 +110,30 @@ public class FutureFragment extends Fragment {
                 }
             });
 
-            EventAdapter eventAdapter = new EventAdapter(getActivity(), eventList);
-            recyclerView.setAdapter(eventAdapter);
-
-            if (eventAdapter.getItemCount() == 0) {
-                recyclerView.setVisibility(View.GONE);
-                emptyView.setVisibility(View.VISIBLE);
+            for (final Event e : eventList) {
+                try {
+                    realm.executeTransaction(new Realm.Transaction() {
+                        @Override
+                        public void execute(Realm realm) {
+                            me.adithya321.countdown.models.Event event = realm.createObject(
+                                    me.adithya321.countdown.models.Event.class, e.id);
+                            event.setTitle(e.title);
+                            event.setDate(e.dTStart);
+                        }
+                    });
+                } catch (Exception exception) {
+                    Log.e("AddRealmEvent", exception.toString());
+                }
             }
+
+            RealmResults<me.adithya321.countdown.models.Event> eventRealmResults = realm
+                    .where(me.adithya321.countdown.models.Event.class)
+                    .findAllSorted("date", Sort.ASCENDING);
+            EventRealmAdapter eventRealmAdapter = new EventRealmAdapter(getActivity(),
+                    eventRealmResults, true, true);
+            RealmRecyclerView realmRecyclerView = (RealmRecyclerView) view
+                    .findViewById(R.id.realm_recycler_view);
+            realmRecyclerView.setAdapter(eventRealmAdapter);
         }
 
         @Override
