@@ -17,6 +17,7 @@
  */
 
 apply plugin: 'com.android.application'
+apply plugin: 'realm-android'
 
 android {
     compileSdkVersion 25
@@ -61,6 +62,7 @@ dependencies {
     compile('com.mikepenz:aboutlibraries:5.9.1@aar') {
         transitive = true
     }
+    compile 'com.github.thorbenprimke:realm-recyclerview:0.9.25'
 
     testCompile 'junit:junit:4.12'
 }

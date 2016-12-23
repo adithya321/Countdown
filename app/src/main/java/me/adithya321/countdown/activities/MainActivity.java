@@ -26,7 +26,6 @@ import android.os.Bundle;
 import android.provider.CalendarContract;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -57,7 +56,7 @@ import me.everything.providers.android.calendar.Calendar;
 import me.everything.providers.android.calendar.CalendarProvider;
 import me.everything.providers.android.calendar.Event;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends RealmBaseActivity {
 
     @BindView(R.id.tabs)
     PagerSlidingTabStrip tabs;

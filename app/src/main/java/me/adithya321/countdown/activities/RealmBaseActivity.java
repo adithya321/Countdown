@@ -16,20 +16,29 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>
  */
 
-package me.adithya321.countdown;
+package me.adithya321.countdown.activities;
 
-import android.app.Application;
-
-import com.karumi.dexter.Dexter;
+import android.support.v7.app.AppCompatActivity;
 
 import io.realm.Realm;
+import io.realm.RealmConfiguration;
 
-public class MyApplication extends Application {
+public class RealmBaseActivity extends AppCompatActivity {
 
-    @Override
-    public void onCreate() {
-        super.onCreate();
-        Dexter.initialize(this);
-        Realm.init(this);
+    private RealmConfiguration realmConfiguration;
+
+    public RealmConfiguration getRealmConfig() {
+        if (realmConfiguration == null) {
+            realmConfiguration = new RealmConfiguration
+                    .Builder()
+                    .deleteRealmIfMigrationNeeded()
+                    .build();
+        }
+        return realmConfiguration;
+    }
+
+    protected void resetRealm() {
+        Realm.deleteRealm(getRealmConfig());
     }
 }
+
