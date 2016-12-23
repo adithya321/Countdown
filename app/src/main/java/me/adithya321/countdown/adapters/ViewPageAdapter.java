@@ -18,7 +18,6 @@
 
 package me.adithya321.countdown.adapters;
 
-import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -31,7 +30,8 @@ import android.widget.ImageView;
 import com.astuetz.PagerSlidingTabStrip;
 
 import me.adithya321.countdown.R;
-import me.adithya321.countdown.TabFragment;
+import me.adithya321.countdown.fragments.FutureFragment;
+import me.adithya321.countdown.fragments.PastFragment;
 
 public class ViewPageAdapter extends FragmentPagerAdapter implements PagerSlidingTabStrip.CustomTabProvider {
 
@@ -73,19 +73,13 @@ public class ViewPageAdapter extends FragmentPagerAdapter implements PagerSlidin
 
     @Override
     public Fragment getItem(int position) {
-        Bundle bundle = new Bundle();
-
         switch (position) {
             case 0:
-            default:
-                bundle.putString("TYPE", "FUTURE");
-                break;
+                return new FutureFragment();
             case 1:
-                bundle.putString("TYPE", "PAST");
-                break;
+                return new PastFragment();
+            default:
+                return new FutureFragment();
         }
-        Fragment fragment = new TabFragment();
-        fragment.setArguments(bundle);
-        return fragment;
     }
 }
