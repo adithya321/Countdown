@@ -28,6 +28,7 @@ public class FutureEvent extends RealmObject {
 
     private String title;
     private long date;
+    private boolean added;
 
     public long getId() {
         return id;
@@ -53,12 +54,21 @@ public class FutureEvent extends RealmObject {
         this.date = date;
     }
 
+    public boolean isAdded() {
+        return added;
+    }
+
+    public void setAdded(boolean added) {
+        this.added = added;
+    }
+
     @Override
     public String toString() {
         return "FutureEvent{" +
                 "id=" + id +
                 ", title='" + title + '\'' +
                 ", date=" + date +
+                ", added=" + added +
                 '}';
     }
 }

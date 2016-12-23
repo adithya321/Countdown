@@ -127,19 +127,23 @@ public class MainActivity extends RealmBaseActivity {
 
         alertDialogBuilder.setView(dialogView);
         alertDialogBuilder.setTitle(R.string.choose_event_dialog_title)
-                .setPositiveButton(R.string.choose_event_dialog_select_all,
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-
-                            }
-                        })
-                .setNegativeButton(R.string.choose_event_dialog_cancel,
+                .setPositiveButton(R.string.choose_event_dialog_done,
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
                             }
                         }).show();
 
-        new getEventsTask().execute();
+        RealmResults<FutureEvent> futureEventRealmResults = realm
+                .where(FutureEvent.class)
+                .equalTo("added", false)
+                .findAllSorted("date", Sort.DESCENDING);
+        if (futureEventRealmResults.size() == 0) new getEventsTask().execute();
+        else {
+            FutureEventRealmAdapter futureEventRealmAdapter = new FutureEventRealmAdapter(this,
+                    futureEventRealmResults, true, true);
+            realmRecyclerView.setAdapter(futureEventRealmAdapter);
+            new getEventsTask().execute();
+        }
     }
 
     private class getEventsTask extends AsyncTask<Void, Void, List<Event>> {
@@ -171,6 +175,7 @@ public class MainActivity extends RealmBaseActivity {
                                     FutureEvent.class, e.id);
                             futureEvent.setTitle(e.title);
                             futureEvent.setDate(e.dTStart);
+                            futureEvent.setAdded(false);
                         }
                     });
                 } catch (Exception exception) {
@@ -180,6 +185,7 @@ public class MainActivity extends RealmBaseActivity {
 
             RealmResults<FutureEvent> futureEventRealmResults = realm
                     .where(FutureEvent.class)
+                    .equalTo("added", false)
                     .findAllSorted("date", Sort.ASCENDING);
             FutureEventRealmAdapter futureEventRealmAdapter = new FutureEventRealmAdapter(MainActivity.this,
                     futureEventRealmResults, true, true);

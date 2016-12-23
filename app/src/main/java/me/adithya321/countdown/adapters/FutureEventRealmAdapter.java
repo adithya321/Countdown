@@ -29,22 +29,28 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.realm.Realm;
 import io.realm.RealmBasedRecyclerViewAdapter;
 import io.realm.RealmResults;
 import io.realm.RealmViewHolder;
 import me.adithya321.countdown.R;
+import me.adithya321.countdown.activities.RealmBaseActivity;
 import me.adithya321.countdown.models.FutureEvent;
 import me.adithya321.countdown.utils.DateUtils;
 
 public class FutureEventRealmAdapter extends RealmBasedRecyclerViewAdapter<FutureEvent,
         FutureEventRealmAdapter.ViewHolder> {
 
+    private Realm realm;
+
     public FutureEventRealmAdapter(Context context, RealmResults<FutureEvent> realmResults,
                                    boolean automaticUpdate, boolean animateResults) {
         super(context, realmResults, automaticUpdate, animateResults);
+        realm = Realm.getInstance(((RealmBaseActivity) context).getRealmConfig());
     }
 
     @Override
@@ -65,9 +71,19 @@ public class FutureEventRealmAdapter extends RealmBasedRecyclerViewAdapter<Futur
             @Override
             public void onClick(View view) {
                 long eventID = futureEvent.getId();
-                Uri uri = ContentUris.withAppendedId(CalendarContract.Events.CONTENT_URI, eventID);
-                Intent intent = new Intent(Intent.ACTION_VIEW).setData(uri);
-                getContext().startActivity(intent);
+                if (futureEvent.isAdded()) {
+                    Uri uri = ContentUris.withAppendedId(CalendarContract.Events.CONTENT_URI, eventID);
+                    Intent intent = new Intent(Intent.ACTION_VIEW).setData(uri);
+                    getContext().startActivity(intent);
+                } else {
+                    realm.executeTransaction(new Realm.Transaction() {
+                        @Override
+                        public void execute(Realm realm) {
+                            futureEvent.setAdded(true);
+                            Toast.makeText(getContext(), "Added", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
             }
         });
     }

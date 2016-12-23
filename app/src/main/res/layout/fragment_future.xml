@@ -28,5 +28,5 @@
         android:layout_height="match_parent"
         app:rrvEmptyLayoutId="@layout/empty_view_future"
         app:rrvLayoutType="LinearLayout"
-        app:rrvSwipeToDelete="false" />
+        app:rrvSwipeToDelete="true" />
 </FrameLayout>

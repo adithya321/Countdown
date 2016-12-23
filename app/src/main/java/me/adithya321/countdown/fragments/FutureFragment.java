@@ -18,19 +18,11 @@
 
 package me.adithya321.countdown.fragments;
 
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -42,10 +34,6 @@ import me.adithya321.countdown.R;
 import me.adithya321.countdown.activities.RealmBaseActivity;
 import me.adithya321.countdown.adapters.FutureEventRealmAdapter;
 import me.adithya321.countdown.models.FutureEvent;
-import me.adithya321.countdown.utils.DateUtils;
-import me.everything.providers.android.calendar.Calendar;
-import me.everything.providers.android.calendar.CalendarProvider;
-import me.everything.providers.android.calendar.Event;
 
 public class FutureFragment extends Fragment {
 
@@ -70,77 +58,11 @@ public class FutureFragment extends Fragment {
 
         RealmResults<FutureEvent> futureEventRealmResults = realm
                 .where(FutureEvent.class)
+                .equalTo("added", true)
                 .findAllSorted("date", Sort.ASCENDING);
-        if (futureEventRealmResults.size() == 0) new getEventsTask().execute();
-        else {
-            FutureEventRealmAdapter futureEventRealmAdapter = new FutureEventRealmAdapter(getActivity(),
-                    futureEventRealmResults, true, true);
-            RealmRecyclerView realmRecyclerView = (RealmRecyclerView) view
-                    .findViewById(R.id.realm_recycler_view);
-            realmRecyclerView.setAdapter(futureEventRealmAdapter);
-            new getEventsTask().execute();
-        }
-    }
 
-    private class getEventsTask extends AsyncTask<Void, Void, List<Event>> {
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            Toast.makeText(getActivity(), "Loading...", Toast.LENGTH_SHORT).show();
-        }
-
-        @Override
-        protected void onPostExecute(List<Event> eventList) {
-            super.onPostExecute(eventList);
-            Collections.sort(eventList, new Comparator<Event>() {
-                @Override
-                public int compare(Event event1, Event event2) {
-                    int days1 = DateUtils.getDaysLeft(event1.dTStart);
-                    int days2 = DateUtils.getDaysLeft(event2.dTStart);
-                    return days1 - days2;
-                }
-            });
-
-            for (final Event e : eventList) {
-                try {
-                    realm.executeTransaction(new Realm.Transaction() {
-                        @Override
-                        public void execute(Realm realm) {
-                            FutureEvent futureEvent = realm.createObject(
-                                    FutureEvent.class, e.id);
-                            futureEvent.setTitle(e.title);
-                            futureEvent.setDate(e.dTStart);
-                        }
-                    });
-                } catch (Exception exception) {
-                    Log.e("AddRealmEvent", exception.toString());
-                }
-            }
-
-            RealmResults<FutureEvent> futureEventRealmResults = realm
-                    .where(FutureEvent.class)
-                    .findAllSorted("date", Sort.ASCENDING);
-            FutureEventRealmAdapter futureEventRealmAdapter = new FutureEventRealmAdapter(getActivity(),
-                    futureEventRealmResults, true, true);
-            RealmRecyclerView realmRecyclerView = (RealmRecyclerView) view
-                    .findViewById(R.id.realm_recycler_view);
-            realmRecyclerView.setAdapter(futureEventRealmAdapter);
-        }
-
-        @Override
-        protected List<Event> doInBackground(Void... params) {
-            CalendarProvider calendarProvider = new CalendarProvider(getActivity());
-            List<Calendar> calendarList = calendarProvider.getCalendars().getList();
-            List<Event> eventList = new ArrayList<>();
-            for (Calendar c : calendarList) {
-                List<Event> events = calendarProvider.getEvents(c.id).getList();
-                for (Event e : events) {
-                    if (DateUtils.getDaysLeft(e.dTStart) >= 0)
-                        eventList.add(e);
-                }
-            }
-            return eventList;
-        }
+        FutureEventRealmAdapter futureEventRealmAdapter = new FutureEventRealmAdapter(getActivity(),
+                futureEventRealmResults, true, true);
+        realmRecyclerView.setAdapter(futureEventRealmAdapter);
     }
 }

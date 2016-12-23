@@ -35,6 +35,5 @@
     <string name="add_countdown_dialog_existing">EXISTING</string>
 
     <string name="choose_event_dialog_title">Choose an Event</string>
-    <string name="choose_event_dialog_select_all">SELECT ALL</string>
-    <string name="choose_event_dialog_cancel">CANCEL</string>
+    <string name="choose_event_dialog_done">DONE</string>
 </resources>
