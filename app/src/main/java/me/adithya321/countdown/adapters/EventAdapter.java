@@ -31,14 +31,12 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import org.joda.time.Days;
-import org.joda.time.LocalDate;
-
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import me.adithya321.countdown.R;
+import me.adithya321.countdown.utils.DateUtils;
 import me.everything.providers.android.calendar.Event;
 
 public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> {
@@ -61,9 +59,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> 
         final Event event = eventList.get(position);
 
         viewHolder.eventTitle.setText(event.title);
-        LocalDate today = new LocalDate();
-        LocalDate eventDate = new LocalDate(event.dTStart);
-        int days = Days.daysBetween(today, eventDate).getDays();
+        int days = DateUtils.getDaysLeft(event.dTStart);
         viewHolder.eventDaysLeft.setText(String.valueOf(days));
         if (days < 0)
             viewHolder.eventIcon.setImageDrawable(context.getResources()
