@@ -41,24 +41,20 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import me.adithya321.countdown.adapters.EventAdapter;
 import me.everything.providers.android.calendar.Calendar;
 import me.everything.providers.android.calendar.CalendarProvider;
 import me.everything.providers.android.calendar.Event;
 
-import static me.adithya321.countdown.R.id.empty_icon;
-import static me.adithya321.countdown.R.id.empty_text;
-import static me.adithya321.countdown.R.id.empty_view;
-import static me.adithya321.countdown.R.id.recycler_view;
-
 public class TabFragment extends Fragment {
 
-    @BindView(recycler_view)
+    @BindView(R.id.recycler_view)
     RecyclerView recyclerView;
-    @BindView(empty_icon)
+    @BindView(R.id.empty_icon)
     ImageView emptyIcon;
-    @BindView(empty_text)
+    @BindView(R.id.empty_text)
     TextView emptyText;
-    @BindView(empty_view)
+    @BindView(R.id.empty_view)
     LinearLayout emptyView;
 
     private String eventType;

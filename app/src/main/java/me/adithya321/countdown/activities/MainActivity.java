@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>
  */
 
-package me.adithya321.countdown;
+package me.adithya321.countdown.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -38,6 +38,8 @@ import com.mikepenz.aboutlibraries.LibsBuilder;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import me.adithya321.countdown.R;
+import me.adithya321.countdown.adapters.ViewPageAdapter;
 
 public class MainActivity extends AppCompatActivity {
 

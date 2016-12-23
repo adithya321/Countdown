@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>
  */
 
-package me.adithya321.countdown;
+package me.adithya321.countdown.adapters;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -29,6 +29,9 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 
 import com.astuetz.PagerSlidingTabStrip;
+
+import me.adithya321.countdown.R;
+import me.adithya321.countdown.TabFragment;
 
 public class ViewPageAdapter extends FragmentPagerAdapter implements PagerSlidingTabStrip.CustomTabProvider {
 

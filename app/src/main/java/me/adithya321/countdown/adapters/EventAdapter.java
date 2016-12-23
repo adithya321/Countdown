@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>
  */
 
-package me.adithya321.countdown;
+package me.adithya321.countdown.adapters;
 
 import android.content.ContentUris;
 import android.content.Context;
@@ -38,6 +38,7 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import me.adithya321.countdown.R;
 import me.everything.providers.android.calendar.Event;
 
 public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> {
@@ -64,6 +65,9 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> 
         LocalDate eventDate = new LocalDate(event.dTStart);
         int days = Days.daysBetween(today, eventDate).getDays();
         viewHolder.eventDaysLeft.setText(String.valueOf(days));
+        if (days < 0)
+            viewHolder.eventIcon.setImageDrawable(context.getResources()
+                    .getDrawable(R.drawable.ic_notifications_off_white));
 
         viewHolder.view.setOnClickListener(new View.OnClickListener() {
             @Override

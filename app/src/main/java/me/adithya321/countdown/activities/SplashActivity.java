@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>
  */
 
-package me.adithya321.countdown;
+package me.adithya321.countdown.activities;
 
 import android.Manifest;
 import android.annotation.TargetApi;
@@ -42,6 +42,7 @@ import com.karumi.dexter.listener.single.SnackbarOnDeniedPermissionListener;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import me.adithya321.countdown.R;
 
 public class SplashActivity extends AppCompatActivity {
 
