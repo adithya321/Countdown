@@ -33,8 +33,8 @@ import com.astuetz.PagerSlidingTabStrip;
 public class ViewPageAdapter extends FragmentPagerAdapter implements PagerSlidingTabStrip.CustomTabProvider {
 
     private final int[] ICONS = {
-            R.drawable.selector_icon_inactive,
-            R.drawable.selector_icon_active
+            R.drawable.selector_icon_active,
+            R.drawable.selector_icon_inactive
     };
 
     public ViewPageAdapter(FragmentManager fm) {
