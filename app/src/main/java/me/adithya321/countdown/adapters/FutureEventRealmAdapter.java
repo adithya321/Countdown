@@ -29,7 +29,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -80,7 +79,6 @@ public class FutureEventRealmAdapter extends RealmBasedRecyclerViewAdapter<Futur
                         @Override
                         public void execute(Realm realm) {
                             futureEvent.setAdded(true);
-                            Toast.makeText(getContext(), "Added", Toast.LENGTH_SHORT).show();
                         }
                     });
                 }

@@ -136,7 +136,7 @@ public class MainActivity extends RealmBaseActivity {
         RealmResults<FutureEvent> futureEventRealmResults = realm
                 .where(FutureEvent.class)
                 .equalTo("added", false)
-                .findAllSorted("date", Sort.DESCENDING);
+                .findAllSorted("date", Sort.ASCENDING);
         if (futureEventRealmResults.size() == 0) new getEventsTask().execute();
         else {
             FutureEventRealmAdapter futureEventRealmAdapter = new FutureEventRealmAdapter(this,
