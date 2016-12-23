@@ -25,9 +25,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -43,7 +40,8 @@ import io.realm.RealmResults;
 import io.realm.Sort;
 import me.adithya321.countdown.R;
 import me.adithya321.countdown.activities.RealmBaseActivity;
-import me.adithya321.countdown.adapters.EventRealmAdapter;
+import me.adithya321.countdown.adapters.FutureEventRealmAdapter;
+import me.adithya321.countdown.models.FutureEvent;
 import me.adithya321.countdown.utils.DateUtils;
 import me.everything.providers.android.calendar.Calendar;
 import me.everything.providers.android.calendar.CalendarProvider;
@@ -53,12 +51,6 @@ public class FutureFragment extends Fragment {
 
     @BindView(R.id.realm_recycler_view)
     RealmRecyclerView realmRecyclerView;
-    @BindView(R.id.empty_icon)
-    ImageView emptyIcon;
-    @BindView(R.id.empty_text)
-    TextView emptyText;
-    @BindView(R.id.empty_view)
-    LinearLayout emptyView;
 
     private Realm realm;
     private View view;
@@ -76,16 +68,16 @@ public class FutureFragment extends Fragment {
         super.onViewCreated(view, bundle);
         ButterKnife.bind(this, view);
 
-        RealmResults<me.adithya321.countdown.models.Event> eventRealmResults = realm
-                .where(me.adithya321.countdown.models.Event.class)
+        RealmResults<FutureEvent> futureEventRealmResults = realm
+                .where(FutureEvent.class)
                 .findAllSorted("date", Sort.ASCENDING);
-        if (eventRealmResults.size() == 0) new getEventsTask().execute();
+        if (futureEventRealmResults.size() == 0) new getEventsTask().execute();
         else {
-            EventRealmAdapter eventRealmAdapter = new EventRealmAdapter(getActivity(),
-                    eventRealmResults, true, true);
+            FutureEventRealmAdapter futureEventRealmAdapter = new FutureEventRealmAdapter(getActivity(),
+                    futureEventRealmResults, true, true);
             RealmRecyclerView realmRecyclerView = (RealmRecyclerView) view
                     .findViewById(R.id.realm_recycler_view);
-            realmRecyclerView.setAdapter(eventRealmAdapter);
+            realmRecyclerView.setAdapter(futureEventRealmAdapter);
             new getEventsTask().execute();
         }
     }
@@ -115,10 +107,10 @@ public class FutureFragment extends Fragment {
                     realm.executeTransaction(new Realm.Transaction() {
                         @Override
                         public void execute(Realm realm) {
-                            me.adithya321.countdown.models.Event event = realm.createObject(
-                                    me.adithya321.countdown.models.Event.class, e.id);
-                            event.setTitle(e.title);
-                            event.setDate(e.dTStart);
+                            FutureEvent futureEvent = realm.createObject(
+                                    FutureEvent.class, e.id);
+                            futureEvent.setTitle(e.title);
+                            futureEvent.setDate(e.dTStart);
                         }
                     });
                 } catch (Exception exception) {
@@ -126,14 +118,14 @@ public class FutureFragment extends Fragment {
                 }
             }
 
-            RealmResults<me.adithya321.countdown.models.Event> eventRealmResults = realm
-                    .where(me.adithya321.countdown.models.Event.class)
+            RealmResults<FutureEvent> futureEventRealmResults = realm
+                    .where(FutureEvent.class)
                     .findAllSorted("date", Sort.ASCENDING);
-            EventRealmAdapter eventRealmAdapter = new EventRealmAdapter(getActivity(),
-                    eventRealmResults, true, true);
+            FutureEventRealmAdapter futureEventRealmAdapter = new FutureEventRealmAdapter(getActivity(),
+                    futureEventRealmResults, true, true);
             RealmRecyclerView realmRecyclerView = (RealmRecyclerView) view
                     .findViewById(R.id.realm_recycler_view);
-            realmRecyclerView.setAdapter(eventRealmAdapter);
+            realmRecyclerView.setAdapter(futureEventRealmAdapter);
         }
 
         @Override

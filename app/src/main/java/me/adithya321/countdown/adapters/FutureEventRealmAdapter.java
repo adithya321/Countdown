@@ -24,64 +24,55 @@ import android.content.Intent;
 import android.net.Uri;
 import android.provider.CalendarContract;
 import android.support.v7.widget.CardView;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import java.util.List;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.realm.RealmBasedRecyclerViewAdapter;
+import io.realm.RealmResults;
+import io.realm.RealmViewHolder;
 import me.adithya321.countdown.R;
+import me.adithya321.countdown.models.FutureEvent;
 import me.adithya321.countdown.utils.DateUtils;
-import me.everything.providers.android.calendar.Event;
 
-public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> {
-    private Context context;
-    private List<Event> eventList;
+public class FutureEventRealmAdapter extends RealmBasedRecyclerViewAdapter<FutureEvent,
+        FutureEventRealmAdapter.ViewHolder> {
 
-    public EventAdapter(Context context, List<Event> eventList) {
-        this.context = context;
-        this.eventList = eventList;
+    public FutureEventRealmAdapter(Context context, RealmResults<FutureEvent> realmResults,
+                                   boolean automaticUpdate, boolean animateResults) {
+        super(context, realmResults, automaticUpdate, animateResults);
     }
 
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
+    public ViewHolder onCreateRealmViewHolder(ViewGroup viewGroup, int i) {
         return new ViewHolder(LayoutInflater.from(viewGroup.getContext())
-                .inflate(R.layout.item_event_list, viewGroup, false));
+                .inflate(R.layout.item_future_event_list, viewGroup, false));
     }
 
     @Override
-    public void onBindViewHolder(final ViewHolder viewHolder, int position) {
-        final Event event = eventList.get(position);
+    public void onBindRealmViewHolder(final ViewHolder viewHolder, int position) {
+        final FutureEvent futureEvent = realmResults.get(position);
 
-        viewHolder.eventTitle.setText(event.title);
-        int days = DateUtils.getDaysLeft(event.dTStart);
+        viewHolder.eventTitle.setText(futureEvent.getTitle());
+        int days = DateUtils.getDaysLeft(futureEvent.getDate());
         viewHolder.eventDaysLeft.setText(String.valueOf(days));
-        if (days < 0)
-            viewHolder.eventIcon.setImageDrawable(context.getResources()
-                    .getDrawable(R.drawable.ic_notifications_off_white));
 
         viewHolder.view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                long eventID = event.id;
+                long eventID = futureEvent.getId();
                 Uri uri = ContentUris.withAppendedId(CalendarContract.Events.CONTENT_URI, eventID);
                 Intent intent = new Intent(Intent.ACTION_VIEW).setData(uri);
-                context.startActivity(intent);
+                getContext().startActivity(intent);
             }
         });
     }
 
-    @Override
-    public int getItemCount() {
-        return eventList.size();
-    }
-
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    public class ViewHolder extends RealmViewHolder {
         @BindView(R.id.header_separator)
         TextView headerSeparator;
         @BindView(R.id.event_circle)

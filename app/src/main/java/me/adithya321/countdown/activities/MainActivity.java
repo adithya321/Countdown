@@ -26,9 +26,8 @@ import android.os.Bundle;
 import android.provider.CalendarContract;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.view.ViewPager;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -48,9 +47,14 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import co.moonmonkeylabs.realmrecyclerview.RealmRecyclerView;
+import io.realm.Realm;
+import io.realm.RealmResults;
+import io.realm.Sort;
 import me.adithya321.countdown.R;
-import me.adithya321.countdown.adapters.EventAdapter;
+import me.adithya321.countdown.adapters.FutureEventRealmAdapter;
 import me.adithya321.countdown.adapters.ViewPageAdapter;
+import me.adithya321.countdown.models.FutureEvent;
 import me.adithya321.countdown.utils.DateUtils;
 import me.everything.providers.android.calendar.Calendar;
 import me.everything.providers.android.calendar.CalendarProvider;
@@ -78,6 +82,7 @@ public class MainActivity extends RealmBaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
+        realm = Realm.getInstance(getRealmConfig());
 
         setSupportActionBar(toolbar);
         if (getSupportActionBar() != null) getSupportActionBar().setTitle(null);
@@ -110,17 +115,15 @@ public class MainActivity extends RealmBaseActivity {
                         }).show();
     }
 
-    private RecyclerView recyclerView;
-    private LinearLayout emptyView;
+    private Realm realm;
+    private RealmRecyclerView realmRecyclerView;
 
     private void showChooseEventDialog() {
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
 
         View dialogView = getLayoutInflater().inflate(R.layout.fragment_future, null);
-        emptyView = (LinearLayout) dialogView.findViewById(R.id.empty_view);
-        recyclerView = (RecyclerView) dialogView.findViewById(R.id.recycler_view);
-        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
-        recyclerView.setLayoutManager(layoutManager);
+        realmRecyclerView = (RealmRecyclerView) dialogView
+                .findViewById(R.id.realm_recycler_view);
 
         alertDialogBuilder.setView(dialogView);
         alertDialogBuilder.setTitle(R.string.choose_event_dialog_title)
@@ -159,13 +162,28 @@ public class MainActivity extends RealmBaseActivity {
                 }
             });
 
-            EventAdapter eventAdapter = new EventAdapter(MainActivity.this, eventList);
-            recyclerView.setAdapter(eventAdapter);
-
-            if (eventAdapter.getItemCount() == 0) {
-                recyclerView.setVisibility(View.GONE);
-                emptyView.setVisibility(View.VISIBLE);
+            for (final Event e : eventList) {
+                try {
+                    realm.executeTransaction(new Realm.Transaction() {
+                        @Override
+                        public void execute(Realm realm) {
+                            FutureEvent futureEvent = realm.createObject(
+                                    FutureEvent.class, e.id);
+                            futureEvent.setTitle(e.title);
+                            futureEvent.setDate(e.dTStart);
+                        }
+                    });
+                } catch (Exception exception) {
+                    Log.e("AddRealmEvent", exception.toString());
+                }
             }
+
+            RealmResults<FutureEvent> futureEventRealmResults = realm
+                    .where(FutureEvent.class)
+                    .findAllSorted("date", Sort.ASCENDING);
+            FutureEventRealmAdapter futureEventRealmAdapter = new FutureEventRealmAdapter(MainActivity.this,
+                    futureEventRealmResults, true, true);
+            realmRecyclerView.setAdapter(futureEventRealmAdapter);
         }
 
         @Override

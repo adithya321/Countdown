@@ -36,38 +36,35 @@ import io.realm.RealmBasedRecyclerViewAdapter;
 import io.realm.RealmResults;
 import io.realm.RealmViewHolder;
 import me.adithya321.countdown.R;
-import me.adithya321.countdown.models.Event;
+import me.adithya321.countdown.models.PastEvent;
 import me.adithya321.countdown.utils.DateUtils;
 
-public class EventRealmAdapter extends RealmBasedRecyclerViewAdapter<Event,
-        EventRealmAdapter.ViewHolder> {
+public class PastEventRealmAdapter extends RealmBasedRecyclerViewAdapter<PastEvent,
+        PastEventRealmAdapter.ViewHolder> {
 
-    public EventRealmAdapter(Context context, RealmResults<Event> realmResults,
-                             boolean automaticUpdate, boolean animateResults) {
+    public PastEventRealmAdapter(Context context, RealmResults<PastEvent> realmResults,
+                                 boolean automaticUpdate, boolean animateResults) {
         super(context, realmResults, automaticUpdate, animateResults);
     }
 
     @Override
     public ViewHolder onCreateRealmViewHolder(ViewGroup viewGroup, int i) {
         return new ViewHolder(LayoutInflater.from(viewGroup.getContext())
-                .inflate(R.layout.item_event_list, viewGroup, false));
+                .inflate(R.layout.item_past_event_list, viewGroup, false));
     }
 
     @Override
     public void onBindRealmViewHolder(final ViewHolder viewHolder, int position) {
-        final Event event = realmResults.get(position);
+        final PastEvent pastEvent = realmResults.get(position);
 
-        viewHolder.eventTitle.setText(event.getTitle());
-        int days = DateUtils.getDaysLeft(event.getDate());
+        viewHolder.eventTitle.setText(pastEvent.getTitle());
+        int days = DateUtils.getDaysLeft(pastEvent.getDate());
         viewHolder.eventDaysLeft.setText(String.valueOf(days));
-        if (days < 0)
-            viewHolder.eventIcon.setImageDrawable(getContext().getResources()
-                    .getDrawable(R.drawable.ic_notifications_off_white));
 
         viewHolder.view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                long eventID = event.getId();
+                long eventID = pastEvent.getId();
                 Uri uri = ContentUris.withAppendedId(CalendarContract.Events.CONTENT_URI, eventID);
                 Intent intent = new Intent(Intent.ACTION_VIEW).setData(uri);
                 getContext().startActivity(intent);

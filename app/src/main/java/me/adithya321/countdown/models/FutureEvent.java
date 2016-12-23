@@ -21,7 +21,7 @@ package me.adithya321.countdown.models;
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
 
-public class Event extends RealmObject {
+public class FutureEvent extends RealmObject {
 
     @PrimaryKey
     private long id;
@@ -55,7 +55,7 @@ public class Event extends RealmObject {
 
     @Override
     public String toString() {
-        return "Event{" +
+        return "FutureEvent{" +
                 "id=" + id +
                 ", title='" + title + '\'' +
                 ", date=" + date +

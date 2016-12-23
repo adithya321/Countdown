@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?><!--
+<?xml version="1.0" encoding="utf-8"?>
+<!--
   ~ Countdown
   ~ Copyright (C) 2016  Adithya J
   ~
@@ -17,25 +18,28 @@
   -->
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/empty_view"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="match_parent"
+    android:gravity="center"
     android:orientation="vertical"
-    tools:ignore="ContentDescription">
+    android:visibility="gone">
+
+    <ImageView
+        android:id="@+id/empty_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:alpha="0.1"
+        android:paddingBottom="20dp"
+        android:src="@drawable/ic_notifications_off_fade"
+        android:tint="#000000" />
 
     <TextView
-        android:id="@+id/header_separator"
-        style="?android:attr/listSeparatorTextViewStyle"
-        android:layout_width="match_parent"
-        android:layout_height="38dp"
-        android:background="@android:color/transparent"
-        android:clickable="true"
-        android:gravity="center_vertical"
-        android:paddingLeft="12dp"
-        android:paddingRight="12dp"
-        android:textColor="@color/textGreyHeader"
-        android:textSize="14sp"
-        android:visibility="gone" />
-
-    <include layout="@layout/event" />
+        android:id="@+id/empty_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingBottom="50dp"
+        android:text="@string/no_past_events"
+        android:textColor="@color/emptyColour"
+        android:textSize="17sp" />
 </LinearLayout>
