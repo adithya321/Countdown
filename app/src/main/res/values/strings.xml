@@ -29,4 +29,12 @@
 
     <string name="no_past_events">No past events</string>
     <string name="no_future_events">No future events</string>
+
+    <string name="add_countdown_dialog_title">Add a Countdown</string>
+    <string name="add_countdown_dialog_new">NEW</string>
+    <string name="add_countdown_dialog_existing">EXISTING</string>
+
+    <string name="choose_event_dialog_title">Choose an Event</string>
+    <string name="choose_event_dialog_select_all">SELECT ALL</string>
+    <string name="choose_event_dialog_cancel">CANCEL</string>
 </resources>
