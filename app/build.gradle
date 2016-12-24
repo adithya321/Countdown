@@ -26,8 +26,8 @@ android {
         applicationId "me.adithya321.countdown"
         minSdkVersion 16
         targetSdkVersion 25
-        versionCode 6
-        versionName "0.51"
+        versionCode 7
+        versionName "0.52"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -58,11 +58,11 @@ dependencies {
     compile 'me.everything:providers-android:1.0.1'
     compile 'joda-time:joda-time:2.9.6'
     compile 'com.karumi:dexter:2.3.1'
-    compile 'com.jpardogo.materialtabstrip:library:1.1.1'
     compile('com.mikepenz:aboutlibraries:5.9.1@aar') {
         transitive = true
     }
     compile 'com.github.thorbenprimke:realm-recyclerview:0.9.25'
+    compile 'com.roughike:bottom-bar:2.0.2'
 
     testCompile 'junit:junit:4.12'
 }

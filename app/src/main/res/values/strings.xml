@@ -19,6 +19,7 @@
 <resources>
     <string name="app_name">Countdown</string>
 
+    <string name="action_add">Add Countdown</string>
     <string name="action_about">About</string>
 
     <string name="grant_permission">GRANT PERMISSION</string>
@@ -28,7 +29,7 @@
     <string name="permission_rationale_settings_button_text">SETTINGS</string>
 
     <string name="no_past_events">No past events</string>
-    <string name="no_future_events">No future events</string>
+    <string name="no_future_events">No upcoming events</string>
 
     <string name="add_countdown_dialog_title">Add a Countdown</string>
     <string name="add_countdown_dialog_new">NEW</string>

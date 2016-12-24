@@ -24,21 +24,20 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.CalendarContract;
-import android.support.design.widget.FloatingActionButton;
-import android.support.v4.view.ViewPager;
+import android.support.annotation.IdRes;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.FrameLayout;
-import android.widget.LinearLayout;
 import android.widget.Toast;
 
-import com.astuetz.PagerSlidingTabStrip;
 import com.mikepenz.aboutlibraries.Libs;
 import com.mikepenz.aboutlibraries.LibsBuilder;
+import com.roughike.bottombar.BottomBar;
+import com.roughike.bottombar.OnTabSelectListener;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -54,7 +53,8 @@ import io.realm.Sort;
 import me.adithya321.countdown.R;
 import me.adithya321.countdown.adapters.FutureEventRealmAdapter;
 import me.adithya321.countdown.adapters.PastEventRealmAdapter;
-import me.adithya321.countdown.adapters.ViewPageAdapter;
+import me.adithya321.countdown.fragments.FutureFragment;
+import me.adithya321.countdown.fragments.PastFragment;
 import me.adithya321.countdown.models.FutureEvent;
 import me.adithya321.countdown.models.PastEvent;
 import me.adithya321.countdown.utils.DateUtils;
@@ -64,20 +64,16 @@ import me.everything.providers.android.calendar.Event;
 
 public class MainActivity extends RealmBaseActivity {
 
-    @BindView(R.id.tabs)
-    PagerSlidingTabStrip tabs;
+
     @BindView(R.id.toolbar)
     Toolbar toolbar;
-    @BindView(R.id.tab_header)
-    LinearLayout tabHeader;
-    @BindView(R.id.viewpager)
-    ViewPager viewpager;
     @BindView(R.id.toolbar_shadow)
     View toolbarShadow;
     @BindView(R.id.header)
     FrameLayout header;
-    @BindView(R.id.fab_button)
-    FloatingActionButton fabButton;
+    @BindView(R.id.bottom_bar)
+    BottomBar bottomBar;
+
     private Realm realm;
     private RealmRecyclerView realmRecyclerView;
 
@@ -89,34 +85,24 @@ public class MainActivity extends RealmBaseActivity {
         realm = Realm.getInstance(getRealmConfig());
 
         setSupportActionBar(toolbar);
-        if (getSupportActionBar() != null) getSupportActionBar().setTitle(null);
+        if (getSupportActionBar() != null) getSupportActionBar().setTitle("Countdown");
 
-        ViewPageAdapter viewPageAdapter = new ViewPageAdapter(getSupportFragmentManager());
-        viewpager.setAdapter(viewPageAdapter);
-
-        tabs.setViewPager(viewpager);
-        int pageMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 4,
-                getResources().getDisplayMetrics());
-        viewpager.setPageMargin(pageMargin);
-    }
-
-    public void onAddFabClick(View view) {
-        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
-        alertDialogBuilder.setTitle(R.string.add_countdown_dialog_title)
-                .setPositiveButton(R.string.add_countdown_dialog_existing,
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                showChooseEventDialog();
-                            }
-                        })
-                .setNeutralButton(R.string.add_countdown_dialog_new,
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                Intent intent = new Intent(Intent.ACTION_INSERT)
-                                        .setData(CalendarContract.Events.CONTENT_URI);
-                                startActivity(intent);
-                            }
-                        }).show();
+        bottomBar.setOnTabSelectListener(new OnTabSelectListener() {
+            @Override
+            public void onTabSelected(@IdRes int tabId) {
+                FragmentTransaction fragmentTransaction = getSupportFragmentManager()
+                        .beginTransaction();
+                switch (tabId) {
+                    case R.id.tab_future:
+                        fragmentTransaction.replace(R.id.fragment, new FutureFragment());
+                        break;
+                    case R.id.tab_past:
+                        fragmentTransaction.replace(R.id.fragment, new PastFragment());
+                        break;
+                }
+                fragmentTransaction.commit();
+            }
+        });
     }
 
     private void showChooseEventDialog() {
@@ -134,7 +120,7 @@ public class MainActivity extends RealmBaseActivity {
                             }
                         }).show();
 
-        if (viewpager.getCurrentItem() == 0) {
+        if (bottomBar.getCurrentTabId() == R.id.tab_future) {
             RealmResults<FutureEvent> futureEventRealmResults = realm
                     .where(FutureEvent.class)
                     .equalTo("added", false)
@@ -146,7 +132,7 @@ public class MainActivity extends RealmBaseActivity {
                 realmRecyclerView.setAdapter(futureEventRealmAdapter);
                 new getFutureEventsTask().execute();
             }
-        } else if (viewpager.getCurrentItem() == 1) {
+        } else if (bottomBar.getCurrentTabId() == R.id.tab_past) {
             RealmResults<PastEvent> pastEventRealmResults = realm
                     .where(PastEvent.class)
                     .equalTo("added", false)
@@ -174,6 +160,24 @@ public class MainActivity extends RealmBaseActivity {
                 new LibsBuilder()
                         .withActivityStyle(Libs.ActivityStyle.LIGHT_DARK_TOOLBAR)
                         .start(this);
+                break;
+            case R.id.action_add:
+                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+                alertDialogBuilder.setTitle(R.string.add_countdown_dialog_title)
+                        .setPositiveButton(R.string.add_countdown_dialog_existing,
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        showChooseEventDialog();
+                                    }
+                                })
+                        .setNeutralButton(R.string.add_countdown_dialog_new,
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        Intent intent = new Intent(Intent.ACTION_INSERT)
+                                                .setData(CalendarContract.Events.CONTENT_URI);
+                                        startActivity(intent);
+                                    }
+                                }).show();
                 break;
         }
         return super.onOptionsItemSelected(item);
