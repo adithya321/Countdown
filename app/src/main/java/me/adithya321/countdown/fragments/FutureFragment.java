@@ -41,11 +41,10 @@ public class FutureFragment extends Fragment {
     RealmRecyclerView realmRecyclerView;
 
     private Realm realm;
-    private View view;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.fragment_future, container, false);
+        View view = inflater.inflate(R.layout.fragment_future, container, false);
         ButterKnife.bind(this, view);
         realm = Realm.getInstance(((RealmBaseActivity) getActivity()).getRealmConfig());
         return view;

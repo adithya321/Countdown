@@ -53,8 +53,10 @@ import io.realm.RealmResults;
 import io.realm.Sort;
 import me.adithya321.countdown.R;
 import me.adithya321.countdown.adapters.FutureEventRealmAdapter;
+import me.adithya321.countdown.adapters.PastEventRealmAdapter;
 import me.adithya321.countdown.adapters.ViewPageAdapter;
 import me.adithya321.countdown.models.FutureEvent;
+import me.adithya321.countdown.models.PastEvent;
 import me.adithya321.countdown.utils.DateUtils;
 import me.everything.providers.android.calendar.Calendar;
 import me.everything.providers.android.calendar.CalendarProvider;
@@ -76,6 +78,8 @@ public class MainActivity extends RealmBaseActivity {
     FrameLayout header;
     @BindView(R.id.fab_button)
     FloatingActionButton fabButton;
+    private Realm realm;
+    private RealmRecyclerView realmRecyclerView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -115,9 +119,6 @@ public class MainActivity extends RealmBaseActivity {
                         }).show();
     }
 
-    private Realm realm;
-    private RealmRecyclerView realmRecyclerView;
-
     private void showChooseEventDialog() {
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
 
@@ -133,20 +134,52 @@ public class MainActivity extends RealmBaseActivity {
                             }
                         }).show();
 
-        RealmResults<FutureEvent> futureEventRealmResults = realm
-                .where(FutureEvent.class)
-                .equalTo("added", false)
-                .findAllSorted("date", Sort.ASCENDING);
-        if (futureEventRealmResults.size() == 0) new getEventsTask().execute();
-        else {
-            FutureEventRealmAdapter futureEventRealmAdapter = new FutureEventRealmAdapter(this,
-                    futureEventRealmResults, true, true);
-            realmRecyclerView.setAdapter(futureEventRealmAdapter);
-            new getEventsTask().execute();
+        if (viewpager.getCurrentItem() == 0) {
+            RealmResults<FutureEvent> futureEventRealmResults = realm
+                    .where(FutureEvent.class)
+                    .equalTo("added", false)
+                    .findAllSorted("date", Sort.ASCENDING);
+            if (futureEventRealmResults.size() == 0) new getFutureEventsTask().execute();
+            else {
+                FutureEventRealmAdapter futureEventRealmAdapter = new FutureEventRealmAdapter(this,
+                        futureEventRealmResults, true, true);
+                realmRecyclerView.setAdapter(futureEventRealmAdapter);
+                new getFutureEventsTask().execute();
+            }
+        } else if (viewpager.getCurrentItem() == 1) {
+            RealmResults<PastEvent> pastEventRealmResults = realm
+                    .where(PastEvent.class)
+                    .equalTo("added", false)
+                    .findAllSorted("date", Sort.DESCENDING);
+            if (pastEventRealmResults.size() == 0) new getPastEventsTask().execute();
+            else {
+                PastEventRealmAdapter pastEventRealmAdapter = new PastEventRealmAdapter(this,
+                        pastEventRealmResults, true, true);
+                realmRecyclerView.setAdapter(pastEventRealmAdapter);
+                new getPastEventsTask().execute();
+            }
         }
     }
 
-    private class getEventsTask extends AsyncTask<Void, Void, List<Event>> {
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_about:
+                new LibsBuilder()
+                        .withActivityStyle(Libs.ActivityStyle.LIGHT_DARK_TOOLBAR)
+                        .start(this);
+                break;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    private class getFutureEventsTask extends AsyncTask<Void, Void, List<Event>> {
 
         @Override
         protected void onPreExecute() {
@@ -208,21 +241,65 @@ public class MainActivity extends RealmBaseActivity {
         }
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
+    private class getPastEventsTask extends AsyncTask<Void, Void, List<Event>> {
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.action_about:
-                new LibsBuilder()
-                        .withActivityStyle(Libs.ActivityStyle.LIGHT_DARK_TOOLBAR)
-                        .start(this);
-                break;
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            Toast.makeText(MainActivity.this, "Loading...", Toast.LENGTH_SHORT).show();
         }
-        return super.onOptionsItemSelected(item);
+
+        @Override
+        protected void onPostExecute(List<Event> eventList) {
+            super.onPostExecute(eventList);
+            Collections.sort(eventList, new Comparator<Event>() {
+                @Override
+                public int compare(Event event1, Event event2) {
+                    int days1 = DateUtils.getDaysLeft(event1.dTStart);
+                    int days2 = DateUtils.getDaysLeft(event2.dTStart);
+                    return days2 - days1;
+                }
+            });
+
+            for (final Event e : eventList) {
+                try {
+                    realm.executeTransaction(new Realm.Transaction() {
+                        @Override
+                        public void execute(Realm realm) {
+                            PastEvent pastEvent = realm.createObject(
+                                    PastEvent.class, e.id);
+                            pastEvent.setTitle(e.title);
+                            pastEvent.setDate(e.dTStart);
+                            pastEvent.setAdded(false);
+                        }
+                    });
+                } catch (Exception exception) {
+                    Log.e("AddRealmEvent", exception.toString());
+                }
+            }
+
+            RealmResults<PastEvent> pastEventRealmResults = realm
+                    .where(PastEvent.class)
+                    .equalTo("added", false)
+                    .findAllSorted("date", Sort.DESCENDING);
+            PastEventRealmAdapter pastEventRealmAdapter = new PastEventRealmAdapter(MainActivity.this,
+                    pastEventRealmResults, true, true);
+            realmRecyclerView.setAdapter(pastEventRealmAdapter);
+        }
+
+        @Override
+        protected List<Event> doInBackground(Void... params) {
+            CalendarProvider calendarProvider = new CalendarProvider(MainActivity.this);
+            List<Calendar> calendarList = calendarProvider.getCalendars().getList();
+            List<Event> eventList = new ArrayList<>();
+            for (Calendar c : calendarList) {
+                List<Event> events = calendarProvider.getEvents(c.id).getList();
+                for (Event e : events) {
+                    if (DateUtils.getDaysLeft(e.dTStart) < 0)
+                        eventList.add(e);
+                }
+            }
+            return eventList;
+        }
     }
 }

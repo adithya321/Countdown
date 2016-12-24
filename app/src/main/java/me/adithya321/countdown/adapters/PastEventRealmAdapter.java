@@ -32,19 +32,24 @@ import android.widget.TextView;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.realm.Realm;
 import io.realm.RealmBasedRecyclerViewAdapter;
 import io.realm.RealmResults;
 import io.realm.RealmViewHolder;
 import me.adithya321.countdown.R;
+import me.adithya321.countdown.activities.RealmBaseActivity;
 import me.adithya321.countdown.models.PastEvent;
 import me.adithya321.countdown.utils.DateUtils;
 
 public class PastEventRealmAdapter extends RealmBasedRecyclerViewAdapter<PastEvent,
         PastEventRealmAdapter.ViewHolder> {
 
+    private Realm realm;
+
     public PastEventRealmAdapter(Context context, RealmResults<PastEvent> realmResults,
                                  boolean automaticUpdate, boolean animateResults) {
         super(context, realmResults, automaticUpdate, animateResults);
+        realm = Realm.getInstance(((RealmBaseActivity) context).getRealmConfig());
     }
 
     @Override
@@ -65,9 +70,18 @@ public class PastEventRealmAdapter extends RealmBasedRecyclerViewAdapter<PastEve
             @Override
             public void onClick(View view) {
                 long eventID = pastEvent.getId();
-                Uri uri = ContentUris.withAppendedId(CalendarContract.Events.CONTENT_URI, eventID);
-                Intent intent = new Intent(Intent.ACTION_VIEW).setData(uri);
-                getContext().startActivity(intent);
+                if (pastEvent.isAdded()) {
+                    Uri uri = ContentUris.withAppendedId(CalendarContract.Events.CONTENT_URI, eventID);
+                    Intent intent = new Intent(Intent.ACTION_VIEW).setData(uri);
+                    getContext().startActivity(intent);
+                } else {
+                    realm.executeTransaction(new Realm.Transaction() {
+                        @Override
+                        public void execute(Realm realm) {
+                            pastEvent.setAdded(true);
+                        }
+                    });
+                }
             }
         });
     }
