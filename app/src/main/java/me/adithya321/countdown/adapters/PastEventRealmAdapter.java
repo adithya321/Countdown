@@ -90,27 +90,6 @@ public class PastEventRealmAdapter extends RealmBasedRecyclerViewAdapter<PastEve
         });
     }
 
-    public class ViewHolder extends RealmViewHolder {
-        @BindView(R.id.header_separator)
-        TextView headerSeparator;
-        @BindView(R.id.event_circle)
-        ImageView eventCircle;
-        @BindView(R.id.event_icon)
-        ImageView eventIcon;
-        @BindView(R.id.event_title)
-        TextView eventTitle;
-        @BindView(R.id.event_days_left)
-        TextView eventDaysLeft;
-        @BindView(R.id.event_card)
-        CardView eventCard;
-
-        public ViewHolder(final View v) {
-            super(v);
-            view = v;
-            ButterKnife.bind(this, v);
-        }
-    }
-
     @Override
     public void onItemSwipedDismiss(int position) {
         final PastEvent deletedPastEvent = realmResults.get(position);
@@ -157,5 +136,26 @@ public class PastEventRealmAdapter extends RealmBasedRecyclerViewAdapter<PastEve
         PastFragment.pastEventRealmAdapter = new PastEventRealmAdapter(
                 getContext(), pastEventRealmResults, true, true);
         PastFragment.recyclerView.setAdapter(PastFragment.pastEventRealmAdapter);
+    }
+
+    public class ViewHolder extends RealmViewHolder {
+        @BindView(R.id.header_separator)
+        TextView headerSeparator;
+        @BindView(R.id.event_circle)
+        ImageView eventCircle;
+        @BindView(R.id.event_icon)
+        ImageView eventIcon;
+        @BindView(R.id.event_title)
+        TextView eventTitle;
+        @BindView(R.id.event_days_left)
+        TextView eventDaysLeft;
+        @BindView(R.id.event_card)
+        CardView eventCard;
+
+        public ViewHolder(final View v) {
+            super(v);
+            view = v;
+            ButterKnife.bind(this, v);
+        }
     }
 }

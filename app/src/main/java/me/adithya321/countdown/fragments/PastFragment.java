@@ -37,12 +37,11 @@ import me.adithya321.countdown.models.PastEvent;
 
 public class PastFragment extends Fragment {
 
-    @BindView(R.id.realm_recycler_view)
-    RealmRecyclerView realmRecyclerView;
-
-    private Realm realm;
     public static PastEventRealmAdapter pastEventRealmAdapter;
     public static RealmRecyclerView recyclerView;
+    @BindView(R.id.realm_recycler_view)
+    RealmRecyclerView realmRecyclerView;
+    private Realm realm;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {

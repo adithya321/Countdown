@@ -37,12 +37,11 @@ import me.adithya321.countdown.models.FutureEvent;
 
 public class FutureFragment extends Fragment {
 
-    @BindView(R.id.realm_recycler_view)
-    RealmRecyclerView realmRecyclerView;
-
-    private Realm realm;
     public static FutureEventRealmAdapter futureEventRealmAdapter;
     public static RealmRecyclerView recyclerView;
+    @BindView(R.id.realm_recycler_view)
+    RealmRecyclerView realmRecyclerView;
+    private Realm realm;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
