@@ -31,7 +31,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import com.mikepenz.aboutlibraries.Libs;
@@ -67,10 +66,6 @@ public class MainActivity extends RealmBaseActivity {
 
     @BindView(R.id.toolbar)
     Toolbar toolbar;
-    @BindView(R.id.toolbar_shadow)
-    View toolbarShadow;
-    @BindView(R.id.header)
-    FrameLayout header;
     @BindView(R.id.bottom_bar)
     BottomBar bottomBar;
 

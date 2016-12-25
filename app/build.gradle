@@ -26,8 +26,8 @@ android {
         applicationId "me.adithya321.countdown"
         minSdkVersion 16
         targetSdkVersion 25
-        versionCode 7
-        versionName "0.52"
+        versionCode 10
+        versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
