@@ -67,4 +67,10 @@
     <style name="ToolbarActionMode" parent="@style/Widget.AppCompat.ActionMode">
         <item name="background">@color/colorPrimary</item>
     </style>
+
+    <style name="BB_BottomBarItem_TitleStyle">
+        <item name="android:maxLines">1</item>
+        <item name="android:height">24dp</item>
+        <item name="android:gravity">center_horizontal</item>
+    </style>
 </resources>

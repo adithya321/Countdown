@@ -36,13 +36,6 @@
             android:theme="@style/Toolbar"
             app:layout_scrollFlags="scroll|enterAlways"
             app:popupTheme="@style/Theme.AppCompat.Light.DarkActionBar" />
-
-        <!--<View
-            android:id="@+id/toolbar_shadow"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/toolbar_shadow_height"
-            android:layout_marginTop="?attr/actionBarSize"
-            android:background="@drawable/toolbar_shadow" />-->
     </android.support.design.widget.AppBarLayout>
 
     <FrameLayout
@@ -59,6 +52,7 @@
         android:layout_height="60dp"
         app:bb_behavior="shy"
         app:bb_tabXmlResource="@xml/bottombar_tabs"
+        app:bb_titleTextAppearance="@style/BB_BottomBarItem_TitleStyle"
         app:layout_anchor="@id/fragment"
         app:layout_anchorGravity="bottom" />
 </android.support.design.widget.CoordinatorLayout>
