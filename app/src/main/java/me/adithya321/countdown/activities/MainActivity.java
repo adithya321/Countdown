@@ -108,7 +108,7 @@ public class MainActivity extends RealmBaseActivity {
     private void showChooseEventDialog() {
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
 
-        View dialogView = getLayoutInflater().inflate(R.layout.fragment_future, null);
+        View dialogView = getLayoutInflater().inflate(R.layout.fragment_add, null);
         realmRecyclerView = (RealmRecyclerView) dialogView
                 .findViewById(R.id.realm_recycler_view);
 

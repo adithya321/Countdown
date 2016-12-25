@@ -41,12 +41,15 @@ public class PastFragment extends Fragment {
     RealmRecyclerView realmRecyclerView;
 
     private Realm realm;
+    public static PastEventRealmAdapter pastEventRealmAdapter;
+    public static RealmRecyclerView recyclerView;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_past, container, false);
         ButterKnife.bind(this, view);
         realm = Realm.getInstance(((RealmBaseActivity) getActivity()).getRealmConfig());
+        recyclerView = realmRecyclerView;
         return view;
     }
 
@@ -60,8 +63,8 @@ public class PastFragment extends Fragment {
                 .equalTo("added", true)
                 .findAllSorted("date", Sort.DESCENDING);
 
-        PastEventRealmAdapter pastEventRealmAdapter = new PastEventRealmAdapter(getActivity(),
+        pastEventRealmAdapter = new PastEventRealmAdapter(getActivity(),
                 pastEventRealmResults, true, true);
-        realmRecyclerView.setAdapter(pastEventRealmAdapter);
+        recyclerView.setAdapter(pastEventRealmAdapter);
     }
 }

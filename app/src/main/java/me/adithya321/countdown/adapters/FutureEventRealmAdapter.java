@@ -23,6 +23,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.provider.CalendarContract;
+import android.support.design.widget.Snackbar;
 import android.support.v7.widget.CardView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -36,8 +37,10 @@ import io.realm.Realm;
 import io.realm.RealmBasedRecyclerViewAdapter;
 import io.realm.RealmResults;
 import io.realm.RealmViewHolder;
+import io.realm.Sort;
 import me.adithya321.countdown.R;
 import me.adithya321.countdown.activities.RealmBaseActivity;
+import me.adithya321.countdown.fragments.FutureFragment;
 import me.adithya321.countdown.models.FutureEvent;
 import me.adithya321.countdown.utils.DateUtils;
 
@@ -45,6 +48,7 @@ public class FutureEventRealmAdapter extends RealmBasedRecyclerViewAdapter<Futur
         FutureEventRealmAdapter.ViewHolder> {
 
     private Realm realm;
+    private View view;
 
     public FutureEventRealmAdapter(Context context, RealmResults<FutureEvent> realmResults,
                                    boolean automaticUpdate, boolean animateResults) {
@@ -66,7 +70,7 @@ public class FutureEventRealmAdapter extends RealmBasedRecyclerViewAdapter<Futur
         int days = DateUtils.getDaysLeft(futureEvent.getDate());
         viewHolder.eventDaysLeft.setText(String.valueOf(days));
 
-        viewHolder.view.setOnClickListener(new View.OnClickListener() {
+        view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 long eventID = futureEvent.getId();
@@ -100,12 +104,58 @@ public class FutureEventRealmAdapter extends RealmBasedRecyclerViewAdapter<Futur
         @BindView(R.id.event_card)
         CardView eventCard;
 
-        private View view;
-
-        public ViewHolder(final View view) {
-            super(view);
-            this.view = view;
-            ButterKnife.bind(this, view);
+        public ViewHolder(final View v) {
+            super(v);
+            view = v;
+            ButterKnife.bind(this, v);
         }
+    }
+
+    @Override
+    public void onItemSwipedDismiss(int position) {
+        final FutureEvent deletedFutureEvent = realmResults.get(position);
+        final long id = deletedFutureEvent.getId();
+        final String title = deletedFutureEvent.getTitle();
+        final long date = deletedFutureEvent.getDate();
+        final boolean added = deletedFutureEvent.isAdded();
+
+        super.onItemSwipedDismiss(position);
+
+        Snackbar.make(view, R.string.countdown_deleted, Snackbar.LENGTH_LONG)
+                .setAction(R.string.undo, new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        realm.executeTransactionAsync(new Realm.Transaction() {
+                            @Override
+                            public void execute(Realm realm) {
+                                FutureEvent futureEvent = realm.createObject(
+                                        FutureEvent.class, id);
+                                futureEvent.setTitle(title);
+                                futureEvent.setDate(date);
+                                futureEvent.setAdded(added);
+                            }
+                        }, new Realm.Transaction.OnSuccess() {
+                            @Override
+                            public void onSuccess() {
+                                resetAdapter();
+                            }
+                        });
+                    }
+                })
+                .setActionTextColor(getContext().getResources().getColor(R.color.colorAccent))
+                .setDuration(3000).show();
+
+        if (position == getItemCount())
+            resetAdapter();
+    }
+
+    private void resetAdapter() {
+        RealmResults<FutureEvent> futureEventRealmResults = realm
+                .where(FutureEvent.class)
+                .equalTo("added", true)
+                .findAllSorted("date", Sort.ASCENDING);
+        FutureFragment.futureEventRealmAdapter = new FutureEventRealmAdapter(
+                getContext(), futureEventRealmResults, true, true);
+        FutureFragment.recyclerView.setAdapter(FutureFragment.futureEventRealmAdapter);
     }
 }

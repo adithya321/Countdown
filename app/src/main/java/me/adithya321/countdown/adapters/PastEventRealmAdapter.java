@@ -23,6 +23,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.provider.CalendarContract;
+import android.support.design.widget.Snackbar;
 import android.support.v7.widget.CardView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -36,8 +37,10 @@ import io.realm.Realm;
 import io.realm.RealmBasedRecyclerViewAdapter;
 import io.realm.RealmResults;
 import io.realm.RealmViewHolder;
+import io.realm.Sort;
 import me.adithya321.countdown.R;
 import me.adithya321.countdown.activities.RealmBaseActivity;
+import me.adithya321.countdown.fragments.PastFragment;
 import me.adithya321.countdown.models.PastEvent;
 import me.adithya321.countdown.utils.DateUtils;
 
@@ -45,6 +48,7 @@ public class PastEventRealmAdapter extends RealmBasedRecyclerViewAdapter<PastEve
         PastEventRealmAdapter.ViewHolder> {
 
     private Realm realm;
+    private View view;
 
     public PastEventRealmAdapter(Context context, RealmResults<PastEvent> realmResults,
                                  boolean automaticUpdate, boolean animateResults) {
@@ -66,7 +70,7 @@ public class PastEventRealmAdapter extends RealmBasedRecyclerViewAdapter<PastEve
         int days = DateUtils.getDaysLeft(pastEvent.getDate());
         viewHolder.eventDaysLeft.setText(String.valueOf(days));
 
-        viewHolder.view.setOnClickListener(new View.OnClickListener() {
+        view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 long eventID = pastEvent.getId();
@@ -100,12 +104,58 @@ public class PastEventRealmAdapter extends RealmBasedRecyclerViewAdapter<PastEve
         @BindView(R.id.event_card)
         CardView eventCard;
 
-        private View view;
-
-        public ViewHolder(final View view) {
-            super(view);
-            this.view = view;
-            ButterKnife.bind(this, view);
+        public ViewHolder(final View v) {
+            super(v);
+            view = v;
+            ButterKnife.bind(this, v);
         }
+    }
+
+    @Override
+    public void onItemSwipedDismiss(int position) {
+        final PastEvent deletedPastEvent = realmResults.get(position);
+        final long id = deletedPastEvent.getId();
+        final String title = deletedPastEvent.getTitle();
+        final long date = deletedPastEvent.getDate();
+        final boolean added = deletedPastEvent.isAdded();
+
+        super.onItemSwipedDismiss(position);
+
+        Snackbar.make(view, R.string.countdown_deleted, Snackbar.LENGTH_LONG)
+                .setAction(R.string.undo, new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        realm.executeTransactionAsync(new Realm.Transaction() {
+                            @Override
+                            public void execute(Realm realm) {
+                                PastEvent pastEvent = realm.createObject(
+                                        PastEvent.class, id);
+                                pastEvent.setTitle(title);
+                                pastEvent.setDate(date);
+                                pastEvent.setAdded(added);
+                            }
+                        }, new Realm.Transaction.OnSuccess() {
+                            @Override
+                            public void onSuccess() {
+                                resetAdapter();
+                            }
+                        });
+                    }
+                })
+                .setActionTextColor(getContext().getResources().getColor(R.color.colorAccent))
+                .setDuration(3000).show();
+
+        if (position == getItemCount())
+            resetAdapter();
+    }
+
+    private void resetAdapter() {
+        RealmResults<PastEvent> pastEventRealmResults = realm
+                .where(PastEvent.class)
+                .equalTo("added", true)
+                .findAllSorted("date", Sort.DESCENDING);
+        PastFragment.pastEventRealmAdapter = new PastEventRealmAdapter(
+                getContext(), pastEventRealmResults, true, true);
+        PastFragment.recyclerView.setAdapter(PastFragment.pastEventRealmAdapter);
     }
 }

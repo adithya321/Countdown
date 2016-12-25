@@ -30,6 +30,7 @@
 
     <string name="no_past_events">No past events</string>
     <string name="no_future_events">No upcoming events</string>
+    <string name="no_events_add">No events to add</string>
 
     <string name="add_countdown_dialog_title">Add a Countdown</string>
     <string name="add_countdown_dialog_new">NEW</string>
@@ -37,4 +38,7 @@
 
     <string name="choose_event_dialog_title">Choose an Event</string>
     <string name="choose_event_dialog_done">DONE</string>
+
+    <string name="countdown_deleted">Countdown deleted</string>
+    <string name="undo">UNDO</string>
 </resources>

@@ -41,12 +41,15 @@ public class FutureFragment extends Fragment {
     RealmRecyclerView realmRecyclerView;
 
     private Realm realm;
+    public static FutureEventRealmAdapter futureEventRealmAdapter;
+    public static RealmRecyclerView recyclerView;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_future, container, false);
         ButterKnife.bind(this, view);
         realm = Realm.getInstance(((RealmBaseActivity) getActivity()).getRealmConfig());
+        recyclerView = realmRecyclerView;
         return view;
     }
 
@@ -60,8 +63,8 @@ public class FutureFragment extends Fragment {
                 .equalTo("added", true)
                 .findAllSorted("date", Sort.ASCENDING);
 
-        FutureEventRealmAdapter futureEventRealmAdapter = new FutureEventRealmAdapter(getActivity(),
+        futureEventRealmAdapter = new FutureEventRealmAdapter(getActivity(),
                 futureEventRealmResults, true, true);
-        realmRecyclerView.setAdapter(futureEventRealmAdapter);
+        recyclerView.setAdapter(futureEventRealmAdapter);
     }
 }
